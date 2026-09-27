@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# Fetches the free-tier dev license files (certificate.bls, blsclient.conf)
+# from webforJ's own official Maven archetype (com.webforj:webforj-archetype-
+# hello-world) instead of hand-copying them from ../testapp or anywhere else.
+#
+# These files aren't per-developer license issuance and aren't Maven-specific
+# build output -- they're bundled verbatim, identical, inside every project
+# the archetype generates. Running `mvn archetype:generate` here is a
+# one-time scaffolding step, not an adoption of Maven as this project's build
+# tool: nothing else in webforc touches Maven, and this script never has to
+# run again unless these files go missing or need refreshing.
+#
+# See ADR-005 for the full reasoning, and the webforJ MCP server's
+# `create_project` tool (https://mcp.webforj.com/mcp) for the same command.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+workdir="$(mktemp -d)"
+trap 'rm -rf "$workdir"' EXIT
+
+echo "Generating a scratch webforJ project from the official archetype..." >&2
+(cd "$workdir" && mvn -q -B archetype:generate \
+  -DarchetypeGroupId=com.webforj \
+  -DarchetypeArtifactId=webforj-archetype-hello-world \
+  -DarchetypeVersion=LATEST \
+  -DgroupId=com.webforcscratch \
+  -DartifactId=webforc-scratch \
+  -Dversion=1.0-SNAPSHOT \
+  -DappName=webforc-scratch \
+  -Dflavor=webforj \
+  -DinteractiveMode=false)
+
+src="$workdir/webforc-scratch/src/main/resources"
+for f in certificate.bls blsclient.conf; do
+  cp -v "$src/$f" "resources/$f"
+done
+
+echo "Done. resources/certificate.bls and resources/blsclient.conf refreshed" \
+  "from webforj-archetype-hello-world." >&2

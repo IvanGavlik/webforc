@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Always compiles the gen-class namespaces, then runs the app -- the
+# deps.edn equivalent of `mvn`'s "compile always happens before run"
+# lifecycle. Two separate `clojure` invocations on purpose: combining
+# tools.build's own alias with the app's runtime deps in a single
+# invocation silently drops the app's deps from the classpath (a real,
+# reproduced Clojure CLI gotcha -- see ADR-004). Kept simple instead of
+# chasing that further.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+clojure -T:build all
+exec clojure -M -m webforc.core "$@"

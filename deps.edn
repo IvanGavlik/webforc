@@ -1,0 +1,38 @@
+{;; "classes" holds the AOT-compiled gen-class output (webforc.Application,
+ ;; webforc.core) as real .class files. webforJ finds its App class by
+ ;; scanning compiled classes on the classpath, not by calling our code
+ ;; directly, so those classes must exist as files on disk, not just loaded
+ ;; in memory -- see README.md ("Why is there a classes/ folder?").
+ :paths ["src" "resources" "classes"]
+
+ :deps
+ {org.clojure/clojure {:mvn/version "1.11.1"}
+  com.webforj/webforj {:mvn/version "26.02"}
+
+  ;; Embedded servlet container. webforJ's own Maven setup runs Jetty
+  ;; out-of-process via jetty-ee11-maven-plugin; we run it in-process
+  ;; instead (see ADR-001/ADR-006), which is also what makes webforc usable
+  ;; as a plain :deps dependency from another Clojure project, not just as
+  ;; a standalone app.
+  ;;
+  ;; These are ordinary, non-excluded dependency declarations on purpose: a
+  ;; consumer project that wants a different Jetty version doesn't need any
+  ;; special opt-out from webforc -- Maven-style "nearest wins" resolution
+  ;; means a version declared directly in the CONSUMER's own :deps map
+  ;; always wins over the same artifact pulled in transitively from here.
+  ;; Declaring nothing on the consumer's side falls back to the versions
+  ;; below. See ADR-006.
+  org.eclipse.jetty/jetty-server {:mvn/version "12.1.8"}
+  org.eclipse.jetty.ee11/jetty-ee11-servlet {:mvn/version "12.1.8"}}
+
+ :aliases
+ {:build
+  {:deps {io.github.clojure/tools.build {:mvn/version "0.10.5"}}
+   :ns-default build}
+
+  :run
+  {:main-opts ["-m" "webforc.core"]}
+
+  :repl
+  {:main-opts ["-m" "nrepl.cmdline"]
+   :extra-deps {nrepl/nrepl {:mvn/version "1.1.1"}}}}}
