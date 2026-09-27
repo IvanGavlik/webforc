@@ -29,8 +29,8 @@ clojure -M:repl
 
 ## Demo / example app
 
-`./bin/dev` (above) starts `webforc`'s own example app —
-`src/webforc/example/`, not part of the library itself
+`./bin/dev` (above) starts `webforc`'s own example app
+
 Once it's running, open:
 
 - `http://localhost:8080/` — a text field and a "Say Hello" button, built
@@ -45,14 +45,12 @@ Once it's running, open:
 
 ## Public API
 
-`webforc.api` is the public surface -- you never write `gen-class`
-directly; it's all plain Clojure functions and data.
+`webforc.api` is the public surface
 
 ### `defapp` / `defview`
 
 Every webforJ app needs one entry point (`defapp`) and one or more routes
-(`defview`). These macros generate the Java classes webforJ expects, so
-you don't have to write `gen-class` yourself.
+(`defview`). These macros generate the Java classes webforJ expects.
 
 ```clojure
 (ns myapp.app
@@ -63,6 +61,8 @@ you don't have to write `gen-class` yourself.
    :theme "dark"
    :profile {:short-name "MYAPP" :name "myapp"}})
 ```
+
+If you want more control
 
 ```clojure
 (ns myapp.views.home
@@ -75,11 +75,6 @@ you don't have to write `gen-class` yourself.
     (w/vbox! self {} (w/label "Hello!"))))
 ```
 
-`path` supports webforJ's route patterns (`"/user/:id"`, etc). Matched
-path parameters arrive as a plain map in the wire function's second
-argument, e.g. `(get params "id")`.
-
-See `src/webforc/example/` for the full working example.
 
 ### Using components
 
@@ -93,8 +88,7 @@ options map, so you build UI with data instead of `Button.`/`.add` calls:
   (w/button {:text "Save" :theme :primary :on-click (fn [_event] ...)}))
 ```
 
-`vbox!`/`hbox!` arrange children inside an existing layout (like a
-`defview`'s `self`). `vbox`/`hbox` build a new, separate layout instead.
+
 See "UI components" below for what's wrapped so far -- anything else is
 used directly as raw webforJ Java.
 
