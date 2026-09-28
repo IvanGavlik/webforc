@@ -43,7 +43,7 @@ silently do nothing.
 
 ## Decision
 
-Option 3, confirmed by direct experimentation before writing any project
+Option 2, confirmed by direct experimentation before writing any project
 code. 
 
 Clojure's `gen-class` **does** support class-level runtime
